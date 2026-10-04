@@ -1,0 +1,557 @@
+1. The 4 Pillars of OOP
+	• Encapsulation (Data Hiding): Wrapping data (variables) and code (methods) together into a single unit, keeping fields private and exposing them via public getters/setters.
+		○ Real-World Example: An ATM machine. You interact with a simple interface (screen/buttons) to withdraw cash, but the internal cash-counting mechanisms and database connections are hidden from you.
+	• Abstraction (Implementation Hiding): Hiding complex implementation details and showing only the essential features to the user.
+		○ Real-World Example: Driving a car. You know accelerating makes it go faster, but you don’t need to understand the combustion engine mechanics or fuel injection systems under the hood.
+	• Inheritance (Reusability): The mechanism where a new class acquires the properties and behaviors of an existing class.
+		○ Real-World Example: A Smartphone. A modern iPhone or Android inherits core features from the original concept of a telephone (calling, texting) but adds its own advanced features (camera, apps).
+	• Polymorphism (Many Forms): The ability of a single action or reference to take on multiple forms depending on the context.
+		○ Real-World Example: The "Cut" command. Cutting a piece of cloth uses scissors; cutting a cake uses a knife; cutting text in an editor uses a clipboard. The command is the same, but the execution depends on the object.
+
+2. Abstract Class vs. Interface
+Feature	Abstract Class	Interface
+Methods	Can have abstract, concrete, and static methods.	Historically only abstract. Can now have default, static, and private methods (Java 8+).
+Variables	Can have instance variables (private, protected, etc.).	Can only have public static final constants.
+Inheritance	A class can extend only one abstract class.	A class can implement multiple interfaces.
+Speed	Slightly faster (direct lookup).	Slightly slower (requires search through interface tables).
+When to use which?
+	• Use an Abstract Class when you want to share a common code base and tightly related state/behavior among closely related objects (e.g., Vehicle $\rightarrow$ Car, Truck).
+	• Use an Interface when you want to define a contract or a peripheral capability for completely unrelated classes (e.g., Flyable implemented by both Airplane and Bird).
+
+3. Why Java Doesn't Support Multiple Inheritance with Classes
+Java excludes multiple inheritance to avoid the Diamond Problem (ambiguity).
+If Class A has a method foo(), and Classes B and C inherit from A and both override foo(), a Class D inheriting from both B and C wouldn't know which version of foo() to invoke.
+	Note: Java avoids this with classes entirely. For interfaces (where multiple inheritance of behavior is allowed via default methods), Java forces the developer to manually override and resolve the conflict explicitly if a naming clash occurs.
+
+4. Polymorphism: Static vs. Dynamic
+Polymorphism allows one interface to control access to a general class of actions.
+Polymorphism is one of the fundamental concepts of Object-Oriented Programming (OOP) that allows a single entity to take multiple forms. It enables the same method or interface to behave differently depending on the object involved. Polymorphism improves code flexibility, reusability, and maintainability.
+	• Polymorphism means "many forms".
+	• It allows the same method to exhibit different behaviors.
+	• It is achieved through method overloading and method overriding.
+
+	• Static (Compile-time) Polymorphism: Resolved during compilation. Achieved via Method Overloading (same method name, different parameter signatures).
+		○ Example: Math.max(int, int) vs Math.max(double, double).
+	• Dynamic (Runtime) Polymorphism: Resolved during runtime. Achieved via Method Overriding (subclass provides a specific implementation of a method declared in its parent class). It relies on Dynamic Method Dispatch.
+		○ Example: Animal a = new Dog(); a.makeSound(); (Calls Dog's version of the method at runtime).
+
+5. Abstraction vs. Encapsulation
+While they sound similar, they operate at different design levels:
+	• Abstraction is a design-level concept. It focuses on what an object does rather than how it does it (achieved via Interfaces and Abstract classes).
+	• Encapsulation is an implementation-level concept. It focuses on how to secure the data by hiding the internal state and restricting direct access (achieved via private access modifiers and getters/setters).
+
+6. Aggregation vs. Composition
+Both are forms of association ("has-a" relationships), but they differ in lifecycle dependency:
+	• Aggregation (Weak Bonding): The child object can exist independently of the parent object.
+		○ Example: A Department has Professors. If the department closes, the professors still exist.
+	• Composition (Strong Bonding): The child object cannot exist without the parent object.
+		○ Example: A House has Rooms. If the house is demolished, the rooms cease to exist.
+
+7. Why is String Immutable in Java?
+	1. String Pool (Memory Efficiency): Java shares string literals in a common pool. If strings were mutable, changing the value for one reference would silently corrupt the data for all other references pointing to the same literal.
+	2. Security: Strings are heavily used for network connections, file paths, and database URLs. If strings were mutable, an attacker could change a validated path/URL right before execution.
+	3. Thread Safety: Since they cannot be modified, strings are inherently thread-safe and don't require synchronization.
+	4. Caching HashCode: The hashcode of a string is cached when it's created. This makes it incredibly fast when used as keys in data structures like HashMap.
+
+8. final vs. finally vs. finalize
+	• final (Keyword): Used to apply restrictions. A final class cannot be inherited, a final method cannot be overridden, and a final variable cannot be reassigned.
+	• finally (Block): A block used in exception handling (try-catch-finally) that always executes (unless JVM crashes via System.exit()), ensuring clean-up tasks like closing database connections take place.
+	• finalize() (Method): A method belonging to the Object class that the Garbage Collector calls right before destroying an object to let it perform cleanup. (Deprecated since Java 9).
+
+9. Marker Interface & Real-time Use Cases
+A Marker Interface is an empty interface with no methods or fields. It serves as a tag to deliver a metadata instruction to the JVM or a compiler.
+Real-time Use Cases:
+	• Serializable: Tells the JVM that this object's state can be converted into a byte stream.
+	• Cloneable: Signals to the Object.clone() method that it is legal to make a field-for-field copy of instances of that class.
+	• RandomAccess: Used by collections to indicate they support fast (constant time) random access (like ArrayList, but unlike LinkedList).
+
+10. Can We Override a Static Method?
+No. You cannot override a static method because method overriding is based on runtime dynamic binding, whereas static methods are bound at compile-time using the class type (static binding).
+If you declare a static method with the exact same signature in a child class, it is called Method Hiding, not overriding. The method that gets called depends entirely on the reference type, not the actual object type.
+
+11. Effective Final Concept (Java 8+)
+A variable is considered effectively final if it is not explicitly declared with the final keyword, but its value never changes after initialization.
+Java introduced this to allow local variables to be used inside lambda expressions or anonymous inner classes without forcing developers to explicitly write final everywhere—provided the variable remains unmutated.
+
+12. Checked Exceptions: Pros & Cons
+A Checked Exception is an exception that is checked by the compiler at compile-time (e.g., IOException, SQLException). The developer is forced to handle it using a try-catch block or declare it in the method signature using throws.
+	• Advantages: Enhances application reliability by forcing the developer to anticipate and gracefully recover from predictable, external failures (like a missing file).
+	• Disadvantages: Can clutter the codebase with excessive boilerplate code (try-catch blocks) and can expose implementation details upward through a call stack via explicit throws declarations.
+
+13. String s = new String("hello"); — Objects Created
+This statement creates 2 objects:
+	1. One in the Heap Memory: Created due to the explicit use of the new keyword.
+	2. One in the String Constant Pool (SCP): Created for the literal "hello", provided that "hello" does not already exist in the pool. (If it already exists in the pool, only 1 object is created in the heap).
+
+14. Dynamic Class Loading
+Dynamic class loading is the process of loading a Java class into memory at runtime on demand, rather than during compilation. It is performed using Class.forName() or via a custom ClassLoader.
+Where is it used?
+	• Database Drivers: Loading a specific JDBC driver at runtime based on user configuration (Class.forName("com.mysql.cj.jdbc.Driver")).
+	• Plugin Architectures: Enabling IDEs (like Eclipse or IntelliJ) or web servers (like Tomcat) to load third-party extensions/servlets dynamically without restarting.
+
+15. Methods Available in the Object Class
+The java.lang.Object class contains 11 methods:
+	1. public final Class<?> getClass() — Returns the runtime class of the object.
+	2. public int hashCode() — Returns a hash code value for the object.
+	3. public boolean equals(Object obj) — Compares two objects for equality.
+	4. protected Object clone() — Creates and returns a copy of this object.
+	5. public String toString() — Returns a string representation of the object.
+	6. public final void notify() — Wakes up a single thread waiting on this object’s monitor.
+	7. public final void notifyAll() — Wakes up all threads waiting on this object’s monitor.
+	8. public final void wait() — Causes the current thread to wait until notified.
+	9. public final void wait(long timeout) — Waits for a specific duration.
+	10. public final void wait(long timeout, int nanos) — Waits for a precise duration down to nanoseconds.
+	11. protected void finalize() — Called by the garbage collector (Deprecated).
+
+From <https://gemini.google.com/glic?hl=en-US> 
+
+
+
+16. What is the difference between Collection and Collections?
+	• Collection: An interface (java.util.Collection) that serves as the root interface for data structures like List, Set, and Queue.
+	• Collections: A utility class (java.util.Collections) consisting entirely of static methods that operate on or return collections (e.g., Collections.sort(), Collections.reverse(), Collections.unmodifiableList()).
+17. Why is Map not part of the Collection interface?
+The Collection interface handles a group of individual, single elements. A Map operates on key-value pairs (). Because Map requires different method signatures (like put(K key, V value) instead of add(E element)), it is incompatible with the core Collection contract and is kept structurally separate.
+18. Difference between List, Set, and Map?
+Feature	List	Set	Map
+Element Type	Single elements	Single elements	Key-Value pairs
+Duplicates	Allows duplicates	Unique elements only	Unique keys; duplicate values allowed
+Order	Maintains insertion order	Order depends on implementation	Order depends on implementation
+Null Elements	Multiple null allowed	At most one null (usually)	One null key; multiple null values
+Export to Sheets
+19. Difference between ArrayList and LinkedList (with time complexity)?
+	• ArrayList: Backed by a dynamically resizing array.
+		○ Search/Retrieval (get): constant time because it supports index-based lookup.
+		○ Insertion/Deletion: in the worst case due to element shifting.
+	• LinkedList: Backed by a doubly-linked list.
+		○ Search/Retrieval (get): because it must traverse the list node by node.
+		○ Insertion/Deletion: once the position is reached (just updating node pointers).
+20. How does ArrayList differ from Vector? When to use CopyOnWriteArrayList?
+	• ArrayList vs Vector: ArrayList is not synchronized (fast, not thread-safe). Vector is synchronized (slow, legacy, thread-safe). ArrayList grows by 50% when full, whereas Vector doubles (100%) its array size.
+	• When to use CopyOnWriteArrayList: Use it in multi-threaded environments where reads vastly outnumber writes. Every write operation clones the underlying array, making writes expensive, but reads are completely lock-free and blazing fast.
+21. Difference between HashSet, LinkedHashSet, and TreeSet?
+	• HashSet: Offers the best performance; elements are stored in an unpredictable order.
+	• LinkedHashSet: Maintains the insertion order of elements using a doubly-linked list running through the hash buckets.
+	• TreeSet: Sorts elements in natural sorting order (or via a custom Comparator). It is backed by a Red-Black tree structure.
+22. How does HashSet internally prevent duplicates?
+Internally, a HashSet uses a HashMap to store its elements. When you call add(element), the HashSet puts the element as a Key in the map (map.put(element, PRESENT)), where PRESENT is a dummy object value. Since HashMap keys must be unique, duplicate additions are naturally rejected.
+
+23. Difference between HashMap, LinkedHashMap, and TreeMap?
+	• HashMap: No order guarantees for keys; fastest lookup ( average).
+	• LinkedHashMap: Maintains insertion order (or access order) of keys.
+	• TreeMap: Sorts keys in natural ascending order or by a Comparator ( performance).
+24. How does HashMap work internally?
+	1. Hashing: When put(key, value) is called, the key’s hashCode() is calculated and passed to a hash function to determine the specific array index (bucket).
+	2. Buckets: The map structure is an array of nodes (buckets).
+	3. Collision: If two different keys map to the same bucket index, they are stored as a LinkedList at that bucket. In Java 8+, if a bucket's size exceeds 8 and the overall map capacity , the LinkedList transforms into a Balanced Tree (Red-Black Tree) to optimize worst-case performance from to .
+	4. Resizing: When total elements exceed the capacity threshold, the array size is doubled, and all existing elements are rehashed into the new array.
+25. Why is HashMap not thread-safe?
+HashMap methods are not synchronized. If multiple threads access and modify it concurrently (e.g., during a resize operation), it can lead to data corruption, race con
+ditions, or structural corruption (like creating cyclic loops in a bucket's linked list, leading to infinite loops during a get() call).
+26. What is load factor in HashMap? What happens when it's exceeded?
+	• Load Factor: A measure (default is 0.75) that dictates when the map should grow. It represents the ratio of structural fullness ().
+	• Exceeded: When the number of elements exceeds this threshold, a resize (rehashing) occurs. The underlying array size doubles, and all keys are remanned to their new bucket indexes.
+27. What is the difference between HashMap and ConcurrentHashMap?
+	• HashMap is not thread-safe. Locking it requires synchronizing the entire object.
+	• ConcurrentHashMap is fully thread-safe and highly concurrent. It avoids global locks, allowing multiple threads to read and write simultaneously without locking the entire map.
+28. How does ConcurrentHashMap work internally?
+In modern Java (8+), ConcurrentHashMap uses a fine-grained locking strategy via synchronized blocks on individual bucket heads along with Compare-And-Swap (CAS) operations. If a bucket is empty, a node is inserted using lock-free CAS. If a bucket is populated, it only locks that specific bucket node, allowing other threads to safely modify different buckets simultaneously.
+29. Can we use a mutable object as a key in HashMap? Why or why not?
+No, it is highly discouraged. If a key's fields mutate after insertion, its hashCode() changes. When you try to look it up later, the map will look in the wrong bucket based on the new hash code, making your original value unretrievable and causing a silent memory leak.
+30. How does TreeMap maintain sorting?
+TreeMap uses a Red-Black tree (a self-balancing binary search tree). Every time a key-value pair is inserted, it traverses the tree comparing keys using either the key's Comparable implementation (compareTo()) or a provided custom Comparator object to place it in the correct sorted node position.
+
+31. Difference between fail-fast and fail-safe iterators?
+	• Fail-Fast: Iterates over the collection's direct data structure. Throws a ConcurrentModificationException immediately if the collection is structurally modified (added/removed elements) during iteration outside the iterator's own methods (e.g., ArrayList iterator).
+	• Fail-Safe (Safe-Failure): Operates on a cloned copy or a view of the collection data (e.g., CopyOnWriteArrayList iterator). It does not throw exceptions if the original collection changes during iteration.
+32. Why are equals() and hashCode() important in Collections?
+They define the contract for object identity and bucket allocation in hashed collections (HashMap, HashSet).
+	• hashCode() tells the structure which bucket to look in.
+	• equals() tells the structure exactly which object matches within that bucket. If you fail to override both correctly, hashed collections will break and fail to locate your objects.
+33. If two objects have the same hashCode(), what will equals() return?
+It can return either true or false. A hash collision happens when two entirely distinct objects happen to generate the exact same integer hash code. In that scenario, equals() evaluates whether they are actually structurally identical.
+34. If equals() returns true, will hashCode() always be the same?
+Yes. According to the official Java language specification contract, if two objects are deemed equal by the equals(Object) method, calling hashCode() on each of them must produce the exact same integer result.
+
+
+
+35. What are the major features introduced in Java 8?
+	• Lambda Expressions: Enables treating functionality as a method argument (functional programming).
+	• Stream API: Provides a functional way to process collections of objects (filtering, mapping, reducing).
+	• Functional Interfaces: Interfaces with exactly one abstract method (annotated with @FunctionalInterface).
+	• Default and Static Methods: Allows writing method implementations inside interfaces.
+	• Optional Class: A container object used to avoid explicit NullPointerException checks.
+	• New Date and Time API: Implements a thread-safe, immutable calendar system under java.time (e.g., LocalDate, LocalTime).
+36. What are functional interfaces? Name some built-in ones.
+A functional interface is an interface that contains exactly one abstract method. It can have any number of default or static methods.
+Common built-in functional interfaces in java.util.function:
+	• Predicate<T>: Takes one argument and returns a boolean (abstract method: test(T t)).
+	• Function<T, R>: Takes one argument and returns a result (abstract method: apply(T t)).
+	• Consumer<T>: Takes one argument and returns nothing/void (abstract method: accept(T t)).
+	• Supplier<T>: Takes no arguments and returns a value (abstract method: get()).
+37. What are default methods in interfaces? What was used before Java 8 instead?
+	• Default Methods: Methods inside an interface that have a body, prefixed with the default keyword. They allow developers to add new utility methods to existing interfaces without breaking the classes that already implement them.
+	• Before Java 8: Abstract classes or Companion Utility Classes were used. For example, the Collection interface had a companion Collections utility class filled with static methods to provide implementations.
+38. What happens if two interfaces have the same default method and a class implements both?
+This causes a compiler error due to the "Diamond Problem" (the compiler doesn't know which method version to inherit).
+To resolve this, the implementing class must override the conflicting method and manually specify which interface's method to use, or write its own implementation completely:
+Java
+
+@Override
+public void log() {
+    InterfaceA.super.log(); // Explicitly chooses InterfaceA's implementation
+}
+39. What is the difference between map() and flatMap() in Streams?
+	• map(): Used for transformation. It takes an element		 and maps it to a single value ($1 \rightarrow 1$). It returns a stream of values (e.g., transforming a Stream<String> to a Stream<Integer> by string length).
+	• flatMap(): Used for transformation + flattening. It maps each element to a stream of values and flattens multiple streams into a single stream ($1 \rightarrow \text{Many}$). It is used to handle nested structures, like converting a Stream<List<String>> into a flat Stream<String>.
+40. Difference between terminal and intermediate operations in Streams?
+	• Intermediate Operations: Transform a stream into another stream (e.g., filter(), map(), sorted()). They are lazy; they do not execute until a terminal operation is called.
+	• Terminal Operations: Produce a non-stream result or a side effect (e.g., collect(), forEach(), count(), reduce()). Calling a terminal operation eagerly triggers the pipeline processing and consumes the stream, after which the stream cannot be reused.
+
+41. What is Optional? What problem does it solve?
+	• Optional<T>: A single-value container object that may or may not contain a non-null value.
+	• Problem Solved: It explicitly handles the absence of a value, safely replacing boilerplate if (obj != null) checks and minimizing the occurrences of runtime NullPointerException crashes.
+42. Difference between isPresent() and ifPresent() in Optional?
+	• isPresent(): A boolean check method. It returns true if a value is contained, requiring an additional .get() call to fetch it (imperative style).
+	• ifPresent(Consumer action): A functional execution method. It accepts a lambda consumer block that runs only if the value is actually present, eliminating the need for an explicit conditional branch.
+43. What are the new features in Java 11 and Java 17?
+Java 11 Major Features:
+	• var in Lambda Parameters: Allows using local variable syntax inside lambda parameters.
+	• New String Methods: isBlank(), lines(), strip(), repeat(n).
+	• Native HTTP Client: Standardized, non-blocking HTTP client supporting HTTP/2.
+	• Run Source Files Directly: Single-file source code programs can be launched directly via java HelloWorld.java without explicit manual compilation.
+Java 17 Major Features (LTS):
+	• Sealed Classes: Dictates exactly which subclasses are permitted to extend or implement a given class or interface (sealed ... permits).
+	• Records: Transparent data-carrier carrier classes that auto-generate boilerplate constructors, getters, equals(), hashCode(), and toString().
+	• Pattern Matching for switch: Enables checking types directly inside a switch block statement.
+	• Text Blocks: Multi-line string literals enclosed in triple quotes (""") that preserve formatting naturally.
+
+44. What is the difference between Stream and ParallelStream? Have you used ParallelStream in a real project?
+	• Difference: A standard Stream executes sequentially on a single thread. A ParallelStream leverages the JVM's shared ForkJoinPool.commonPool() to split the data stream into chunks and process them concurrently across multiple CPU threads.
+	• Real Project Usage: Yes, I utilize them in production tasks specifically for CPU-bound operations involving isolated datasets, such as parsing a massive, read-only collection of data strings into structural database records concurrently.
+Note: They should be avoided for I/O operations, network requests, or database lookups, as the shared ForkJoinPool can easily block and degrade the entire application's performance.
+
+From <https://gemini.google.com/glic?hl=en-US> 
+
+
+
+45. Explain the complete lifecycle of a Thread.
+A Java thread transitions through these distinct states (defined in Thread.State):
+	1. New: A thread instance is created (new Thread()) but start() has not yet been called.
+	2. Runnable: start() has been invoked. The thread is either actively executing or ready and waiting for OS CPU allocation.
+	3. Blocked: The thread is waiting to acquire a monitor lock to enter a synchronized block/method.
+	4. Waiting: The thread is waiting indefinitely for another thread to perform a specific action (e.g., via wait(), join(), or LockSupport.park()).
+	5. Timed Waiting: The thread is waiting for a specified timeout period (e.g., via sleep(ms), wait(ms), or join(ms)).
+	6. Terminated: The thread has finished executing its run() method or aborted due to an unhandled exception.
+46. Difference between Runnable and Callable?
+	• Runnable: Introduced in Java 1. Its single method run() returns void and cannot throw checked exceptions.
+	• Callable: Introduced in Java 5. Its single method call() returns a generic value V and can throw checked exceptions. It is designed to work closely with thread pools and futures.
+47. Difference between Thread.start() and Thread.run()?
+	• start(): Allocates a brand-new system thread, registers it with the OS thread scheduler, and triggers the asynchronous execution of the run() method on that new thread.
+	• run(): Performs a standard, synchronous, direct method call. No new thread is spawned; the code executes sequentially within the calling thread (e.g., the main thread).
+48. Difference between synchronized block and synchronized method?
+	• Synchronized Method: Locks the entire method. It implicitly locks the this instance (for instance methods) or the Class object (for static methods). It offers less granular control.
+	• Synchronized Block: Locks a specific block of code inside a method. It allows locking on an explicit target object (synchronized(lockObject)), offering finer granularity, minimizing thread blocking, and maximizing performance.
+49. What is class-level locking vs object-level locking?
+	• Object-level locking: Protects non-static code. Every instance of a class has its own monitor lock. Multiple threads can execute the same synchronized code simultaneously if they operate on different class instances.
+	• Class-level locking: Protects static code or explicitly locks the class resource (synchronized(MyClass.class)). There is exactly one lock per class across the entire JVM. Threads are blocked globally regardless of which instance they own.
+50. What is the volatile keyword? Where and why is it used?
+	• What it is: A field modifier guaranteeing that variables are read/written directly from/to Main Memory, bypassing CPU registers or caches.
+	• Why it's used: It guarantees visibility—changes made to a variable by one thread are instantly visible to all other threads.
+	• Where it's used: Used for state flags (e.g., volatile boolean keepRunning = true;) where multiple threads read a flag but only one writes to it. It does not provide atomicity (e.g., count++ is not safe with volatile).
+
+51. Difference between volatile and Atomic variables?
+	• volatile: Guarantees visibility only. It does not protect compound operations. A write operation dependent on a read (like variable incrementation) is not thread-safe.
+	• Atomic Variables (e.g., AtomicInteger): Guarantee both visibility and atomicity. They use hardware-level Compare-And-Swap (CAS) machine instructions to perform atomic operations (like incrementAndGet()) completely lock-free.
+52. What is a deadlock? How do you detect and prevent it?
+	• Deadlock: A situation where Thread 1 holds Lock A and waits for Lock B, while Thread 2 holds Lock B and waits for Lock A. Both wait indefinitely.
+	• Detection: You can analyze thread dumps via utility tools like jstack, VisualVM, or programmatically using ThreadMXBean.findDeadlockedThreads().
+	• Prevention: * Always acquire locks in a strict, uniform global order.
+		○ Use time-outs for lock acquisition (ReentrantLock.tryLock(timeout)).
+		○ Minimize nesting locks or keeping locks over lengthy business transactions.
+53. What is the difference between sleep(), wait(), and notify()?
+	• Thread.sleep(ms): A static method that pauses execution of the current thread. It does not release any locks it currently holds.
+	• Object.wait(): An instance method used for inter-thread communication. The calling thread must own the object's monitor. Calling it causes the thread to release the lock and wait until another thread wakes it up.
+	• Object.notify() / notifyAll(): Wakes up one (or all) threads waiting on that specific object's monitor. Must also be called from within a synchronized context.
+54. What is ExecutorService? Why is it better than creating threads manually?
+	• ExecutorService: A high-level asynchronous execution framework (java.util.concurrent) that abstracts away low-level thread management using internal thread pools.
+	• Why it is better: Creating native threads is an expensive OS operation. ExecutorService reuses existing threads, controls thread allocation limits, manages an internal task work-queue, and reduces resource starvation overhead.
+55. What is ForkJoinPool? Where is it used?
+	• ForkJoinPool: A specialized ExecutorService optimized for divide-and-conquer parallel algorithms. It uses a work-stealing algorithm where idle threads steal pending tasks from busy threads' queues.
+	• Where used: It powers the underlying machinery for Java 8 parallel streams (parallelStream()) and CompletableFuture.
+
+56. What is CompletableFuture? How does it differ from Future?
+	• Future: Introduced in Java 5. Represents an asynchronous computation result. It requires blocking methods (.get()) or polling loops to extract the final value, making it impossible to chain steps elegantly.
+	• CompletableFuture: Introduced in Java 8. It implements Future and CompletionStage. It is fully non-blocking and functional, enabling rich pipeline chaining (e.g., .thenApply().thenCompose().exceptionally()) and asynchronous callback orchestration.
+57. What is CountDownLatch? How is it used in multithreading?
+	• CountDownLatch: A concurrency utility that allows one or more threads to block and wait until a set of operations performed by other threads completes.
+	• How it is used: It is initialized with a counter (e.g., new CountDownLatch(3)). Main threads call latch.await() to block. Worker threads perform tasks and call latch.countDown(). When the counter hits zero, the waiting main threads resume.
+58. What is a Daemon Thread?
+A low-priority thread that runs in the background to provide support services to user threads (e.g., the Garbage Collector thread). The JVM will automatically shut down and exit once all foreground active user threads have completed execution, abruptly terminating any running daemon threads. You flag one via thread.setDaemon(true) before calling start().
+59. If not using join(), what are the alternatives?
+If you need to orchestrate thread completion without using thread.join(), you can utilize:
+	• CountDownLatch: Block a thread until a specified count of worker tasks complete.
+	• CyclicBarrier: Coordinate a common barrier point where multiple threads wait for each other.
+	• ExecutorService.invokeAll() or shutdown() + awaitTermination(): Wait for an entire thread pool cluster to finish.
+	• CompletableFuture.allOf(...).join(): Coordinate multiple non-blocking futures cleanly.
+
+
+
+60. Explain JVM memory architecture (Heap, Stack, Metaspace)?
+JVM memory is divided into distinct execution data areas:
+	• Heap Memory: A shared runtime data area where all objects and their instance variables are allocated. It is the primary target for Garbage Collection (GC). It is split into the Young Generation (Eden, S1, S2) and Old Generation.
+	• Stack Memory: Thread-specific memory. Each thread has its own runtime stack that stores method execution frames. Each frame contains local variables, primitive data types, and reference pointers to objects living on the Heap. Frames are pushed on method call and popped on method return ($O(1)$ allocation).
+	• Metaspace: Replaced PermGen in Java 8. It lives in native off-heap OS memory and stores class metadata, method structures, field data, and the constant pool. It dynamically expands by default unless bounded by a max size flag.
+61. How many class loaders are there in JVM? What are their types?
+Java utilizes a hierarchical system of class loaders operating under the Delegation Principle (passing loading requests up to parent loaders before trying it themselves). There are three primary built-in types:
+	1. Bootstrap Class Loader: The core root loader written in native code. It loads fundamental runtime classes from the base JDK modules (like java.lang.*).
+	2. Platform Class Loader (formerly Extension): Loads platform-specific extensions or optional Java packages.
+	3. Application (System) Class Loader: Loads application-specific classes located on your application’s classpath or module path (-classpath or -cp).
+
+62. How does JVM handle memory management and Garbage Collection?
+Memory management is completely automated using generational tracking based on the hypothesis that most objects die young:
+	1. Allocation: New objects are allocated in the Eden space of the Young Generation.
+	2. Minor GC: When Eden fills up, a Minor GC triggers. Live objects are moved to a Survivor space (S0/S1). Objects that survive multiple rounds of copy-cycling are eventually "promoted" to the Old Generation.
+	3. Major GC / Full GC: When the Old Generation fills up, a Major GC cleans it out.
+	• GC Algorithms: Modern JVMs use concurrent/parallel collectors like G1 (Garbage-First) or ZGC (Z Garbage Collector), which break memory into regions and compact them concurrently to keep stop-the-world application pauses to a bare minimum.
+63. What are common causes of OutOfMemoryError in production? How do you troubleshoot it?
+	• Common Causes:
+		○ java.lang.OutOfMemoryError: Java heap space: Active references holding onto massive data structures (or true memory leaks) causing the heap to max out.
+		○ java.lang.OutOfMemoryError: Metaspace: Loading too many dynamic classes (common in frameworks using reflection/CGLIB generation heavily).
+		○ java.lang.OutOfMemoryError: Unable to create new native thread: The host operating system has run out of memory or file handles to map new physical threads.
+	• Troubleshooting Steps:
+		1. Configure the JVM flag -XX:+HeapDumpOnOutOfMemoryError to auto-capture a .hprof memory snapshot at the moment of failure.
+		2. Open the heap dump using memory profilers like Eclipse MAT (Memory Analyzer Tool) or VisualVM.
+		3. Locate the "Leak Suspects" list, group allocations by class type, and trace back through incoming references to find the roots blocking the garbage collector.
+
+64. How do you detect and fix memory leaks in Java?
+A memory leak occurs when unused objects remain pinned in memory because active references still point to them, preventing GC.
+	• Detection: Monitor live memory metrics over time using APM tools (e.g., Dynatrace, New Relic) or JVM utilities (jstat, JConsole). If heap usage forms a continuous upward saw-tooth pattern that fails to drop after manual Full GCs, a leak is present.
+	• Common Culprits & Fixes:
+		○ Static Collections: Unbounded static Maps/Lists grow forever. Fix: Use eviction bounds or clear them explicitly.
+		○ Unclosed Resources: Database connections or file streams left open. Fix: Always wrap them in a try-with-resources block.
+		○ Bad equals()/hashCode(): Custom keys inserted into a HashMap cannot be found or evicted if these methods are missing or broken. Fix: Implement robust, immutable object keys.
+65. What is the Java Memory Model (JMM)?
+The Java Memory Model (JMM) is a specification that defines how the JVM interacts with computer hardware memory (CPU caches, registers, and main RAM). It establishes the exact rules for how thread actions read/write shared variables and guarantees:
+	• Visibility: Ensuring when one thread modifies a variable, other threads see that update instantly (achieved via volatile or explicit synchronization).
+	• Ordering: Preventing compiler optimizations or CPU instruction reordering from breaking thread logic (establishing Happens-Before relationships).
+
+
+
+66. Find the missing element in an array.
+If an array contains unique integers from $1$ to $n$ with one number missing, the most efficient approach uses the arithmetic sum formula: $\text{Sum} = \frac{n \times (n + 1)}{2}$.
+Java
+
+public int findMissingNumber(int[] nums, int n) {
+    int expectedSum = n * (n + 1) / 2;
+    int actualSum = 0;
+    for (int num : nums) {
+        actualSum += num;
+    }
+    return expectedSum - actualSum; // Time: O(n), Space: O(1)
+}
+67. Find the first non-repeated character in a string.
+You can use a fixed-size frequency array (assuming standard ASCII/Extended ASCII characters) to track counts, then scan the string a second time to find the first unique character.
+Java
+
+public char firstNonRepeatedChar(String str) {
+    int[] counts = new int[256]; // Size 256 covers ASCII
+    for (int i = 0; i < str.length(); i++) {
+        counts[str.charAt(i)]++;
+    }
+    for (int i = 0; i < str.length(); i++) {
+        if (counts[str.charAt(i)] == 1) {
+            return str.charAt(i); // Time: O(n), Space: O(1)
+        }
+    }
+    return '\0'; // Return null char if no unique character exists
+}
+68. Find the second highest number in an array.
+Track both the highest and secondHighest values in a single loop traversal.
+Java
+
+public int findSecondHighest(int[] nums) {
+    int highest = Integer.MIN_VALUE;
+    int secondHighest = Integer.MIN_VALUE;
+for (int num : nums) {
+        if (num > highest) {
+            secondHighest = highest;
+            highest = num;
+        } else if (num > secondHighest && num != highest) {
+            secondHighest = num;
+        }
+    }
+    return secondHighest; // Time: O(n), Space: O(1)
+}
+69. Reverse a sentence word by word.
+Split the sentence by spaces and iterate backward, or use a pointer-based approach to construct the reversed string.
+Java
+
+public String reverseSentence(String sentence) {
+    if (sentence == null || sentence.trim().isEmpty()) return sentence;
+    String[] words = sentence.trim().split("\\s+");
+    StringBuilder sb = new StringBuilder();
+    
+    for (int i = words.length - 1; i >= 0; i--) {
+        sb.append(words[i]);
+        if (i > 0) sb.append(" ");
+    }
+    return sb.toString(); // Time: O(n), Space: O(n)
+}
+70. Find frequency of each character in a string without using HashMap.
+Use a standard integer counting array mapped to ASCII positions.
+Java
+
+public void printCharFrequency(String str) {
+    int[] freq = new int[256];
+    for (char c : str.toCharArray()) {
+        freq[c]++;
+    }
+    for (int i = 0; i < freq.length; i++) {
+        if (freq[i] > 0) {
+            System.out.println((char) i + ": " + freq[i]);
+        }
+    }
+}
+71. Find vowels from the string "Hello".
+Java
+
+public void printVowels(String str) {
+    String vowels = "aeiouAEIOU";
+    for (char c : str.toCharArray()) {
+        if (vowels.indexOf(c) != -1) {
+            System.out.print(c + " "); // Prints: e o
+        }
+    }
+}
+72. Check if a number is prime.
+An optimized check checks divisibility only up to the square root of the number ($\sqrt{n}$).
+Java
+
+public boolean isPrime(int n) {
+    if (n <= 1) return false;
+    if (n == 2 || n == 3) return true;
+    if (n % 2 == 0 || n % 3 == 0) return false;
+    
+    // Check form of 6k +/- 1 up to sqrt(n)
+    for (int i = 5; i * i <= n; i += 6) {
+        if (n % i == 0 || n % (i + 2) == 0) return false;
+    }
+    return true; // Time: O(sqrt(n))
+}
+73. Find pair in an array with sum equal to a target value.
+If the array is unsorted, a HashSet provides a fast lookup for the required complement element.
+Java
+
+public void findPair(int[] nums, int target) {
+    Set<Integer> seen = new HashSet<>();
+    for (int num : nums) {
+        int complement = target - num;
+        if (seen.contains(complement)) {
+            System.out.println("Pair found: (" + complement + ", " + num + ")");
+            return; // Remove return statement if you want to find all pairs
+        }
+        seen.add(num); // Time: O(n), Space: O(n)
+    }
+}
+
+74. Implement an LRU Cache.
+An LRU (Least Recently Used) cache requires $O(1)$ operations for both get and put. This is achieved by combining a HashMap (for $O(1)$ lookups) with a Doubly Linked List (to maintain access order in $O(1)$ time).
+Java
+
+import java.util.HashMap;
+public class LRUCache {
+    class Node {
+        int key, value;
+        Node prev, next;
+        Node(int k, int v) { this.key = k; this.value = v; }
+    }
+private final int capacity;
+    private final HashMap<Integer, Node> map;
+    private final Node head, tail;
+public LRUCache(int capacity) {
+        this.capacity = capacity;
+        this.map = new HashMap<>();
+        head = new Node(0, 0);
+        tail = new Node(0, 0);
+        head.next = tail;
+        tail.prev = head;
+    }
+public int get(int key) {
+        if (!map.containsKey(key)) return -1;
+        Node node = map.get(key);
+        remove(node);
+        insertToHead(node); // Move to head to mark as recently used
+        return node.value;
+    }
+public void put(int key, int value) {
+        if (map.containsKey(key)) {
+            remove(map.get(key));
+        }
+        if (map.size() == capacity) {
+            map.remove(tail.prev.key);
+            remove(tail.prev); // Evict LRU element from tail
+        }
+        Node newNode = new Node(key, value);
+        map.put(key, newNode);
+        insertToHead(newNode);
+    }
+private void remove(Node node) {
+        node.prev.next = node.next;
+        node.next.prev = node.prev;
+    }
+private void insertToHead(Node node) {
+        node.next = head.next;
+        node.next.prev = node;
+        head.next = node;
+        node.prev = head;
+    }
+}
+
+75. Producer-Consumer problem using wait() and notify()
+This implements a thread-safe custom shared buffer using structural monitor synchronization blocks.
+Java
+
+import java.util.LinkedList;
+import java.util.Queue;
+public class ProducerConsumer {
+    private final Queue<Integer> buffer = new LinkedList<>();
+    private final int CAPACITY = 5;
+public void produce() throws InterruptedException {
+        int value = 0;
+        while (true) {
+            synchronized (this) {
+                // Wait while buffer is full
+                while (buffer.size() == CAPACITY) {
+                    wait();
+                }
+                System.out.println("Produced: " + value);
+                buffer.add(value++);
+                
+                // Wake up consumer thread
+                notify();
+                Thread.sleep(1000); // Simulate processing latency
+            }
+        }
+    }
+public void consume() throws InterruptedException {
+        while (true) {
+            synchronized (this) {
+                // Wait while buffer is empty
+                while (buffer.isEmpty()) {
+                    wait();
+                }
+                int val = buffer.poll();
+                System.out.println("Consumed: " + val);
+                
+                // Wake up producer thread
+                notify();
+                Thread.sleep(1000);
+            }
+        }
+    }
+}
+
+From <https://gemini.google.com/glic?hl=en-US> 
+
+
